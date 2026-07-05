@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnimeHub AI v4.0 - Plateforme & Super Admin OS</title>
+    <style>
+        :root {
+            --bg-obsidian: #050509;
+            --bg-glass: rgba(18, 18, 30, 0.75);
+            --bg-glass-hover: rgba(30, 30, 52, 0.88);
+            --bg-glass-heavy: rgba(10, 10, 18, 0.96);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(139, 92, 246, 0.4);
+            --primary-gradient: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            --legendary-gradient: linear-gradient(135deg, #f59e0b, #ef4444, #8b5cf6);
+            --admin-gradient: linear-gradient(135deg, #ef4444, #f59e0b);
+            --credit-gradient: linear-gradient(135deg, #10b981, #06b6d4, #8b5cf6);
+            --ai-gradient: linear-gradient(135deg, #06b6d4, #8b5cf6, #ec4899);
+            --accent-cyan: #06b6d4;
+            --accent-pink: #ec4899;
+            --accent-purple: #8b5cf6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0; padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-obsidian);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 85% 80%, rgba(6, 182, 212, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(239, 68, 68, 0.08) 0%, transparent 60%);
+            background-attachment: fixed;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-obsidian); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-purple); }
+
+        .glass-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            border-color: var(--border-glow);
+            box-shadow: 0 10px 30px -10px rgba(139, 92, 246, 0.3);
+        }
+
+        .app-shell { display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-glass-heavy);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-glass);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; bottom: 0; left: 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .brand {
+            padding: 22px 20px;
+            display: flex; align-items: center; gap: 12px;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .brand-logo {
+            width: 44px; height: 44px;
+            background: var(--ai-gradient);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 20px; color: #fff;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+            animation: pulseGlow 3s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); }
+            100% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.8); }
+        }
+
+        .brand-text {
+            font-size: 22px; font-weight: 900;
+            background: linear-gradient(90deg, #fff, var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-section {
+            padding: 14px 14px 6px 14px;
+            font-size: 11px; font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-list {
+            padding: 0 12px;
+            display: flex; flex-direction: column; gap: 4px;
+            flex-grow: 1; overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex; align-items: center; gap: 13px;
+            padding: 11px 15px; border-radius: 14px;
+            color: var(--text-muted); cursor: pointer;
+            transition: all 0.2s ease; font-weight: 600; font-size: 14px;
+            border: 1px solid transparent;
+        }
+        .nav-item:hover { color: #fff; background: rgba(255, 255, 255, 0.05); }
+        .nav-item.active {
+            color: #fff;
+            background: linear-gradient(90deg, rgba(139, 92, 246, 0.25), rgba(6, 182, 212, 0.05));
+            border-left: 3px solid var(--accent-cyan);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+        .nav-item.super-admin {
+            color: #fca5a5;
+            background: linear-gradient(90deg, rgba(239, 68, 68, 0.2), rgba(245, 158, 11, 0.05));
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            font-weight: 800;
+        }
+        .nav-item.super-admin:hover {
+            background: linear-gradient(90deg, rgba(239, 68, 68, 0.35), rgba(245, 158, 11, 0.15));
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .nav-item svg { width: 19px; height: 19px; flex-shrink: 0; }
+
+        .badge-ai { background: var(--ai-gradient); color: #fff; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 10px; margin-left: auto; }
+        .badge-credits { background: var(--credit-gradient); color: #fff; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 10px; margin-left: auto; }
+
+        .sidebar-footer { padding: 14px; border-top: 1px solid var(--border-glass); }
+
+        .tier-widget {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(245, 158, 11, 0.15));
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            padding: 14px; border-radius: 16px;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+
+        /* Main Wrapper */
+        .main-wrapper {
+            margin-left: 280px;
+            flex-grow: 1;
+            padding: 24px 36px 90px 36px;
+            max-width: calc(100vw - 280px);
+        }
+
+        .top-navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 28px; gap: 20px;
+        }
+
+        .search-bar-wrap { position: relative; flex-grow: 1; max-width: 500px; }
+        .search-input {
+            width: 100%; background: var(--bg-glass);
+            border: 1px solid var(--border-glass); border-radius: 14px;
+            padding: 12px 16px 12px 44px; color: #fff; font-size: 14px; outline: none; transition: all 0.2s;
+        }
+        .search-input:focus { border-color: var(--accent-cyan); box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2); }
+        .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+
+        .header-controls { display: flex; align-items: center; gap: 14px; }
+
+        .credit-wallet-pill {
+            display: flex; align-items: center; gap: 8px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.15));
+            border: 1px solid var(--success);
+            padding: 6px 14px; border-radius: 25px;
+            cursor: pointer; font-weight: 800; font-size: 13px;
+            color: #fff; transition: transform 0.2s;
+        }
+        .credit-wallet-pill:hover { transform: scale(1.04); }
+
+        .user-pill {
+            display: flex; align-items: center; gap: 10px;
+            background: var(--bg-glass); border: 1px solid var(--border-glow);
+            padding: 6px 14px 6px 6px; border-radius: 30px;
+            cursor: pointer; transition: border-color 0.2s;
+        }
+        .user-avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: var(--admin-gradient);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 15px;
+        }
+
+        .btn {
+            padding: 11px 20px; border-radius: 13px; font-weight: 700; font-size: 14px;
+            cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            transition: all 0.25s; border: none; outline: none;
+        }
+        .btn-primary { background: var(--primary-gradient); color: #fff; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4); }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-legendary { background: var(--legendary-gradient); color: #fff; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4); }
+        .btn-admin { background: var(--admin-gradient); color: #fff; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); }
+        .btn-admin:hover { transform: translateY(-2px); }
+        .btn-credit { background: var(--credit-gradient); color: #fff; }
+        .btn-secondary { background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid var(--border-glass); }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .view-panel { display: none; animation: fadeIn 0.35s ease; }
+        .view-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .section-title { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+        .section-title::before { content: ''; width: 4px; height: 24px; background: var(--accent-cyan); border-radius: 4px; }
+
+        .hero-carousel {
+            position: relative; border-radius: 28px; overflow: hidden;
+            background: linear-gradient(135deg, rgba(18, 18, 30, 0.9), rgba(49, 16, 66, 0.8));
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            padding: 40px; margin-bottom: 34px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .anime-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 22px; margin-bottom: 36px; }
+        .card-item {
+            background: var(--bg-glass); border: 1px solid var(--border-glass);
+            border-radius: 18px; overflow: hidden; cursor: pointer; transition: all 0.3s;
+            display: flex; flex-direction: column; position: relative;
+        }
+        .card-item:hover { transform: translateY(-7px); border-color: var(--accent-purple); }
+        .card-poster { width: 100%; padding-top: 140%; position: relative; background: #121826; }
+        .card-tag { position: absolute; top: 10px; left: 10px; background: rgba(5, 5, 9, 0.85); color: #fbbf24; font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 6px; }
+        .card-content { padding: 14px; display: flex; flex-direction: column; flex-grow: 1; }
+
+        /* Super Admin Tabs */
+        .admin-subnav { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 26px; border-bottom: 1px solid var(--border-glass); padding-bottom: 16px; }
+        .admin-tab-btn {
+            padding: 10px 18px; border-radius: 12px; background: var(--bg-glass);
+            border: 1px solid var(--border-glass); color: var(--text-muted); font-size: 13px; font-weight: 800; cursor: pointer; transition: all 0.2s;
+        }
+        .admin-tab-btn:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+        .admin-tab-btn.active { background: var(--admin-gradient); color: #fff; border-color: transparent; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); }
+
+        .admin-subpanel { display: none; }
+        .admin-subpanel.active { display: block; animation: fadeIn 0.25s ease; }
+
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+        .admin-table th, .admin-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-glass); font-size: 13px; }
+        .admin-table th { color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 11px; }
+
+        /* KPI Cards */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px; margin-bottom: 28px; }
+        .kpi-box {
+            background: var(--bg-glass); border: 1px solid var(--border-glass);
+            padding: 20px; border-radius: 18px; position: relative; overflow: hidden;
+        }
+
+        @media (max-width: 950px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-wrapper { margin-left: 0; max-width: 100vw; padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-shell">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-logo">OS</div>
+                <div>
+                    <div class="brand-text">AnimeHub</div>
+                    <span style="font-size:10px; color:#fca5a5; font-weight:800; letter-spacing:1px;">SUPER ADMIN v4.0</span>
+                </div>
+            </div>
+
+            <div class="nav-section">Navigation Principale</div>
+            <nav class="nav-list">
+                <div class="nav-item active" onclick="navigate('home')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span>Accueil & Simulcast</span>
+                </div>
+                <div class="nav-item" onclick="navigate('credits')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10h8M8 14h8"/></svg>
+                    <span>🪙 Économie & Crédits</span>
+                    <span class="badge-credits">350🪙</span>
+                </div>
+                <div class="nav-item" onclick="navigate('explore')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <span>Catalogue Licencié</span>
+                </div>
+                <div class="nav-item" onclick="navigate('ai')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    <span>Assistant IA Otaku</span>
+                    <span class="badge-ai">GPT-4o</span>
+                </div>
+            </nav>
+
+            <div class="nav-section">Système Propriétaire Exclusif</div>
+            <div class="nav-list" style="flex-grow:0;">
+                <div class="nav-item super-admin" onclick="navigate('admin')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span>🛡️ Super Admin OS</span>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="tier-widget">
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-weight:800; font-size:12px;">
+                        <span>👑 SUPER ADMIN</span>
+                        <span style="font-size:10px; background:rgba(16,185,129,0.2); color:var(--success); padding:2px 6px; border-radius:4px;">2FA ACTIF</span>
+                    </div>
+                    <p style="font-size:11px; color:#fca5a5; font-weight:700; margin-top:4px; word-break:break-all;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1c717d70757f777d777378732d292d5c7b717d7570327f7371">[email&#160;protected]</a></p>
+                    <button class="btn btn-admin" style="width:100%; padding:8px; font-size:12px; margin-top:6px;" onclick="navigate('admin')">Ouvrir le Centre de Contrôle</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN AREA -->
+        <main class="main-wrapper">
+            <!-- TOP BAR -->
+            <header class="top-navbar">
+                <div class="search-bar-wrap">
+                    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" class="search-input" placeholder="Rechercher un anime ou taper un email utilisateur (#USR)...">
+                </div>
+
+                <div class="header-controls">
+                    <div class="credit-wallet-pill" onclick="navigate('credits')">
+                        <span>🪙</span><span>350</span><span style="font-size:11px; color:var(--text-muted);">Crédits</span>
+                    </div>
+                    <div class="user-pill" onclick="navigate('admin')">
+                        <div class="user-avatar">🛡️</div>
+                        <div>
+                            <div style="font-size:13px; font-weight:800; color:#fca5a5;">malickakodo151</div>
+                            <div style="font-size:10px; color:var(--success);">Super Administrateur Principal</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- TAB 1: HOME -->
+            <section id="panel-home" class="view-panel active">
+                <div class="hero-carousel">
+                    <div style="max-width: 580px; z-index: 2;">
+                        <span style="background:rgba(239,68,68,0.2); border:1px solid var(--danger); color:#fca5a5; padding:5px 14px; border-radius:20px; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:6px; margin-bottom:14px;">
+                            ⚡ SIMULCAST MONDIAL • LICENCE OFFICIELLE
+                        </span>
+                        <h1 style="font-size:38px; font-weight:900; margin-bottom:14px;">Dandadan : Le Choc Occulte</h1>
+                        <p style="color:#cbd5e1; font-size:14px; line-height:1.6; margin-bottom:22px;">Plateforme optimisée en temps réel par le Super Administrateur <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="513c303d38323a303a3e353e60646011363c30383d7f323e3c">[email&#160;protected]</a>.</p>
+                        <button class="btn btn-primary" onclick="alert('Lancement de l\'épisode 12 en 4K HDR !')">▶ Regarder l'Épisode</button>
+                    </div>
+                </div>
+                <div class="section-header"><h2 class="section-title">🔥 Tendances du Jour</h2></div>
+                <div class="anime-grid" id="grid-trending"></div>
+            </section>
+
+            <!-- TAB 2: CREDITS -->
+            <section id="panel-credits" class="view-panel">
+                <div class="section-header"><h2 class="section-title">🪙 Économie de Crédits & Boutique</h2></div>
+                <div class="glass-card" style="padding:24px;"><p>Système de missions quotidiennes et de désactivation temporaire des publicités opérationnel.</p></div>
+            </section>
+
+            <!-- TAB 3: EXPLORE -->
+            <section id="panel-explore" class="view-panel">
+                <div class="section-header"><h2 class="section-title">Catalogue Licencié</h2></div>
+            </section>
+
+            <!-- TAB 4: AI -->
+            <section id="panel-ai" class="view-panel">
+                <div class="section-header"><h2 class="section-title">🤖 Assistant IA Otaku</h2></div>
+            </section>
+
+            <!-- TAB SUPER ADMIN OS (ULTRADÉTAILLÉ) -->
+            <section id="panel-admin" class="view-panel">
+                <div style="background:linear-gradient(135deg, rgba(239,68,68,0.2), rgba(245,158,11,0.15)); border:1px solid rgba(239,68,68,0.5); padding:24px; border-radius:22px; margin-bottom:28px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;">
+                    <div>
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+                            <span style="font-size:24px;">🛡️</span>
+                            <h2 style="font-size:26px; font-weight:900; color:#fff;">Centre de Contrôle Super Administrateur</h2>
+                        </div>
+                        <p style="font-size:14px; color:#fca5a5; font-weight:700;">Propriétaire exclusif : <b><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="244945484d474f454f4b404b151115644349454d480a474b49">[email&#160;protected]</a></b> • Authentification Forte 2FA & Chiffrement RSA Actifs</p>
+                    </div>
+                    <div style="display:flex; gap:12px;">
+                        <button class="btn btn-secondary" style="font-size:12px;" onclick="alert('Audit de sécurité : Aucun accès non autorisé. 3 appareils autorisés pour malickakodo151@gmail.com.')">📱 Gérer Appareils 2FA</button>
+                        <button class="btn btn-admin" style="font-size:12px;" onclick="alert('Génération d\'un mot de passe unique à haute entropie et envoi chiffré !')">🔑 Modifier Mot de Passe</button>
+                    </div>
+                </div>
+
+                <!-- SUB-NAVIGATION TABS -->
+                <div class="admin-subnav">
+                    <button class="admin-tab-btn active" onclick="switchAdminTab('dashboard', this)">📊 Dashboard & Finances</button>
+                    <button class="admin-tab-btn" onclick="switchAdminTab('users', this)">👥 Gestion Utilisateurs & Crédits</button>
+                    <button class="admin-tab-btn" onclick="switchAdminTab('cms', this)">🎬 Contenus, Langues & Hors-Ligne</button>
+                    <button class="admin-tab-btn" onclick="switchAdminTab('promo', this)">🎟️ Abonnements & Codes Promo</button>
+                    <button class="admin-tab-btn" onclick="switchAdminTab('notifs', this)">📢 Notifications Broadcast</button>
+                    <button class="admin-tab-btn" onclick="switchAdminTab('mod', this)">🛡️ Modération & Sauvegardes BDD</button>
+                    <button class="admin-tab-btn" style="border-color:var(--accent-cyan); color:var(--accent-cyan);" onclick="switchAdminTab('admin-ai', this)">🤖 IA d'Administration OS</button>
+                </div>
+
+                <!-- SUB-PANEL 1: DASHBOARD & FINANCES -->
+                <div id="sub-dashboard" class="admin-subpanel active">
+                    <div class="kpi-grid">
+                        <div class="kpi-box" style="border-color:rgba(16,185,129,0.4);">
+                            <div style="font-size:11px; color:var(--text-muted); font-weight:700;">UTILISATEURS TOTAUX</div>
+                            <div style="font-size:30px; font-weight:900; color:var(--success); margin-top:6px;">142,890</div>
+                            <div style="font-size:11px; color:var(--success); margin-top:4px;">+1,420 connectés en direct</div>
+                        </div>
+                        <div class="kpi-box" style="border-color:rgba(6,182,212,0.4);">
+                            <div style="font-size:11px; color:var(--text-muted); font-weight:700;">REVENUS PUBLICITAIRES (MOIS)</div>
+                            <div style="font-size:30px; font-weight:900; color:var(--accent-cyan); margin-top:6px;">14,520 €</div>
+                            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">eCPM : 4.85 € • Fill Rate : 96.4%</div>
+                        </div>
+                        <div class="kpi-box" style="border-color:rgba(245,158,11,0.4);">
+                            <div style="font-size:11px; color:var(--text-muted); font-weight:700;">REVENUS ABONNEMENTS (MOIS)</div>
+                            <div style="font-size:30px; font-weight:900; color:#fbbf24; margin-top:6px;">38,410 €</div>
+                            <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">3,850 VIP Légendaires</div>
+                        </div>
+                        <div class="kpi-box" style="border-color:rgba(239,68,68,0.5); background:rgba(239,68,68,0.08);">
+                            <div style="font-size:11px; color:#fca5a5; font-weight:700;">BÉNÉFICES NETS ESTIMÉS</div>
+                            <div style="font-size:30px; font-weight:900; color:#fff; margin-top:6px;">44,280 €</div>
+                            <div style="font-size:11px; color:var(--success); font-weight:700; margin-top:4px;">Après déduction frais serveurs S3</div>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px; flex-wrap:wrap;">
+                        <div class="glass-card" style="padding:24px;">
+                            <h3 style="font-size:16px; font-weight:800; margin-bottom:16px;">📈 Statistiques de Visionnage & Téléchargements Licenciés</h3>
+                            <table class="admin-table">
+                                <thead><tr><th>Titre Licence</th><th>Format</th><th>Pistes Audio</th><th>Vues (24h)</th><th>Téléchargements</th></tr></thead>
+                                <tbody>
+                                    <tr><td><b>Dandadan : Choc Occulte</b></td><td>Simulcast</td><td>VO, VOSTFR, VF</td><td>48,200</td><td>12,400 (Hors ligne)</td></tr>
+                                    <tr><td><b>Solo Leveling : Arise S2</b></td><td>Série</td><td>VO, VOSTFR, VF</td><td>41,900</td><td>9,850 (Hors ligne)</td></tr>
+                                    <tr><td><b>Demon Slayer : Forteresse</b></td><td>Film Licencié</td><td>VOSTFR, VF</td><td>35,100</td><td>7,200 (Hors ligne)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="glass-card" style="padding:24px; border-color:var(--warning);">
+                            <h3 style="font-size:16px; font-weight:800; color:var(--warning); margin-bottom:14px;">⚠️ Alertes Système Directes</h3>
+                            <div style="display:flex; flex-direction:column; gap:12px; font-size:13px;">
+                                <div style="background:rgba(245,158,11,0.1); padding:12px; border-radius:12px; border-left:4px solid var(--warning);">
+                                    <b>Serveur S3 US-East :</b> Pic de charge à 78% lors du Simulcast de Dandadan. Scaling automatique en cours.
+                                </div>
+                                <div style="background:rgba(16,185,129,0.1); padding:12px; border-radius:12px; border-left:4px solid var(--success);">
+                                    <b>Bouclier Anti-Cheat :</b> 42 tentatives de farming automatique de crédits bloquées aujourd'hui.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-PANEL 2: GESTION UTILISATEURS -->
+                <div id="sub-users" class="admin-subpanel">
+                    <div class="glass-card" style="padding:24px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px;">
+                            <h3 style="font-size:18px; font-weight:800;">Recherche & Actions Utilisateurs</h3>
+                            <input type="text" class="search-input" style="max-width:320px;" placeholder="Rechercher pseudo ou email...">
+                        </div>
+
+                        <table class="admin-table">
+                            <thead><tr><th>Utilisateur</th><th>Email</th><th>Offre</th><th>Solde Crédits</th><th>Statut</th><th>Actions Super Admin</th></tr></thead>
+                            <tbody>
+                                <tr style="background:rgba(239,68,68,0.1);">
+                                    <td>👑 <b>malickakodo151</b></td>
+                                    <td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="eb868a878288808a80848f84dadedaab8c868a8287c5888486">[email&#160;protected]</a></td>
+                                    <td><span style="color:#fbbf24; font-weight:900;">SUPER ADMIN</span></td>
+                                    <td><b>∞ Illimité</b></td>
+                                    <td><span style="color:var(--success); font-weight:800;">PROPRIÉTAIRE</span></td>
+                                    <td><span style="color:var(--text-muted); font-size:11px;">Exclusif (Intouchable)</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Kenshin_AI</td>
+                                    <td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e68d8388958e8f88c88992878d93a6818b878f8ac885898b">[email&#160;protected]</a></td>
+                                    <td><span style="color:#fbbf24; font-weight:800;">Légendaire</span></td>
+                                    <td><b>350 🪙</b></td>
+                                    <td><span style="color:var(--success);">Actif</span></td>
+                                    <td style="display:flex; gap:6px;">
+                                        <button class="btn btn-credit" style="padding:5px 10px; font-size:11px;" onclick="adminGiveCredits('Kenshin_AI')">+500🪙</button>
+                                        <button class="btn btn-secondary" style="padding:5px 10px; font-size:11px;" onclick="alert('Offre changée en Gratuit pour Kenshin_AI.')">Rétrograder</button>
+                                        <button class="btn btn-admin" style="padding:5px 10px; font-size:11px;" onclick="alert('Compte suspendu temporairement pour 7 jours.')">Bannir</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Sora_Streamer</td>
+                                    <td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c2b1adb0a3fbfb82a6abb1a1adb0a6eca3b2b2">[email&#160;protected]</a></td>
+                                    <td><span style="color:var(--accent-cyan); font-weight:800;">Premium</span></td>
+                                    <td><b>1,240 🪙</b></td>
+                                    <td><span style="color:var(--success);">Actif</span></td>
+                                    <td style="display:flex; gap:6px;">
+                                        <button class="btn btn-credit" style="padding:5px 10px; font-size:11px;" onclick="adminGiveCredits('Sora_Streamer')">+500🪙</button>
+                                        <button class="btn btn-legendary" style="padding:5px 10px; font-size:11px;" onclick="alert('Offre VIP Légendaire offerte à Sora_Streamer !')">Offrir VIP</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SUB-PANEL 3: CMS CONTENUS & LANGUES -->
+                <div id="sub-cms" class="admin-subpanel">
+                    <div class="glass-card" style="padding:24px; margin-bottom:24px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+                            <h3 style="font-size:18px; font-weight:800;">Ajouter ou Modifier un Contenu Licencié</h3>
+                            <button class="btn btn-primary" onclick="alert('Ouverture de la modale d\'importation Jikan API / Fichier vidéo S4 HD !')">+ Ajouter Nouvel Anime / Manga</button>
+                        </div>
+                        <table class="admin-table">
+                            <thead><tr><th>Titre</th><th>Catégorie</th><th>Pistes Audio Configurées</th><th>Téléchargement Hors Ligne</th><th>Actions</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td><b>Dandadan</b></td><td>Série Simulcast</td><td>✔️ VO • ✔️ VOSTFR • ✔️ VF</td>
+                                    <td><span style="color:var(--success); font-weight:800;">Autorisé (1080p / 4K)</span></td>
+                                    <td><button class="btn btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="alert('Édition des pistes audio et licences de Dandadan.')">⚙️ Gérer Droits</button></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Demon Slayer : Forteresse</b></td><td>Film Cinéma Licencié</td><td>✔️ VOSTFR • ✔️ VF</td>
+                                    <td><span style="color:var(--warning); font-weight:800;">Restreint (Streaming Seul)</span></td>
+                                    <td><button class="btn btn-secondary" style="padding:6px 12px; font-size:12px;">⚙️ Gérer Droits</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SUB-PANEL 4: ABONNEMENTS & CODES PROMO -->
+                <div id="sub-promo" class="admin-subpanel">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                        <div class="glass-card" style="padding:24px;">
+                            <h3 style="font-size:18px; font-weight:800; margin-bottom:14px;">🎟️ Créer un Code de Réduction / Promotion</h3>
+                            <div style="display:flex; flex-direction:column; gap:12px;">
+                                <input type="text" class="search-input" placeholder="Code (ex: MALICK2026 ou OTAKU50)">
+                                <input type="number" class="search-input" placeholder="Réduction en % (ex: 30%)">
+                                <button class="btn btn-legendary" onclick="alert('Code promotionnel MALICK2026 (-30%) créé et activé !')">Activer Code Promo</button>
+                            </div>
+                        </div>
+                        <div class="glass-card" style="padding:24px;">
+                            <h3 style="font-size:18px; font-weight:800; margin-bottom:14px;">Paramétrage Prix Abonnements</h3>
+                            <div style="display:flex; flex-direction:column; gap:10px; font-size:14px;">
+                                <div style="display:flex; justify-content:space-between;"><span>Prix Premium :</span> <b>7.99 € / mois</b></div>
+                                <div style="display:flex; justify-content:space-between;"><span>Prix Légendaire :</span> <b>12.99 € / mois</b></div>
+                                <button class="btn btn-secondary" style="margin-top:8px;" onclick="alert('Grille tarifaire sauvegardée dans le cloud S3.')">Mettre à jour Tarifs</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-PANEL 5: NOTIFICATIONS BROADCAST -->
+                <div id="sub-notifs" class="admin-subpanel">
+                    <div class="glass-card" style="padding:24px; max-width:700px;">
+                        <h3 style="font-size:18px; font-weight:800; margin-bottom:16px;">📢 Envoyer une Notification Broadcast Push</h3>
+                        <div style="display:flex; flex-direction:column; gap:14px;">
+                            <select class="search-input" style="background:#121826;">
+                                <option>À TOUS LES UTILISATEURS (142,890 membres)</option>
+                                <option>Abonnés VIP Légendaires Uniquement</option>
+                                <option>Utilisateurs Gratuit (Promo Pass Sans-Pub)</option>
+                            </select>
+                            <input type="text" class="search-input" placeholder="Titre de l'alerte (ex: Sortie Épisode Final Solo Leveling !)">
+                            <textarea class="search-input" style="height:90px;" placeholder="Message de la notification push..."></textarea>
+                            <button class="btn btn-admin" onclick="alert('🚀 Notification envoyée instantanément à 142,890 utilisateurs !')">Envoyer Notification Push en Direct</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-PANEL 6: MODÉRATION & SAUVEGARDES BDD -->
+                <div id="sub-mod" class="admin-subpanel">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                        <div class="glass-card" style="padding:24px;">
+                            <h3 style="font-size:18px; font-weight:800; margin-bottom:14px;">🛡️ File d'attente Modération (Commentaires Signalés)</h3>
+                            <div style="display:flex; flex-direction:column; gap:12px;">
+                                <div style="background:rgba(255,255,255,0.04); padding:14px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+                                    <div>
+                                        <b style="color:var(--danger)">Spam détecté (@Bot99) :</b>
+                                        <p style="font-size:12px; color:var(--text-muted)">"Lien de streaming illégal cliquable..."</p>
+                                    </div>
+                                    <button class="btn btn-admin" style="padding:6px 12px; font-size:12px;" onclick="this.parentElement.remove(); alert('Commentaire supprimé et IP bannie !')">Supprimer</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card" style="padding:24px; border-color:var(--success);">
+                            <h3 style="font-size:18px; font-weight:800; color:var(--success); margin-bottom:14px;">💾 Sauvegardes et Export Base de Données</h3>
+                            <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">Sauvegarde automatique cloud effectuée chaque nuit à 04:00 GMT.</p>
+                            <div style="display:flex; flex-direction:column; gap:12px;">
+                                <button class="btn btn-primary" onclick="alert('💾 Sauvegarde manuelle complète (SQL/JSON) générée et stockée sur S3 !')">Créer Sauvegarde Manuelle 1-Clic</button>
+                                <button class="btn btn-secondary" onclick="alert('📦 Exportation JSON complète de la base de données (142k profils) en cours de téléchargement...')">Exporter Base de Données (.JSON)</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-PANEL 7: IA D'ADMINISTRATION SUPER ADMIN -->
+                <div id="sub-admin-ai" class="admin-subpanel">
+                    <div class="glass-card" style="padding:28px; border:1px solid var(--accent-cyan); background:linear-gradient(135deg, rgba(6,182,212,0.1), rgba(139,92,246,0.1));">
+                        <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
+                            <div style="width:50px; height:50px; border-radius:16px; background:var(--ai-gradient); display:flex; align-items:center; justify-content:center; font-size:24px;">🤖</div>
+                            <div>
+                                <h3 style="font-size:22px; font-weight:900;">AnimeHub OS AI — Assistant Stratégique Exclusif</h3>
+                                <p style="font-size:13px; color:var(--accent-cyan);">Réservé au Super Administrateur : <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5a373b363339313b31353e356b6f6b1a3d373b333674393537">[email&#160;protected]</a></p>
+                            </div>
+                        </div>
+
+                        <div style="background:rgba(0,0,0,0.4); padding:20px; border-radius:16px; margin-bottom:20px; font-size:14px; line-height:1.6;" id="admin-ai-response-box">
+                            🤖 <b>Rapport Automatique d'Aujourd'hui :</b> Bonjour Malick ! Votre plateforme affiche une excellente santé financière avec un bénéfice net estimé de +44,280 € ce mois-ci. Les pistes audio VOSTFR et VF sur *Dandadan* génèrent 65% de l'engagement global. Aucune faille de sécurité détectée sur les serveurs.
+                        </div>
+
+                        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                            <button class="btn btn-secondary" onclick="triggerAdminAI('Générer un rapport financier complet et optimiser le taux eCPM des régies.')">📊 Générer Rapport Financier</button>
+                            <button class="btn btn-secondary" onclick="triggerAdminAI('Analyser les tentatives de triche sur les crédits et purger les bots.')">🛡️ Détecter Anomalies / Bots</button>
+                            <button class="btn btn-ai" onclick="triggerAdminAI('Quelles nouvelles licences manga suggères-tu d\'acquérir pour le trimestre Q3 ?')">🔮 Suggérer Nouvelles Licences</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        const CATALOG = [
+            { title: "Dandadan : Le Choc Occulte", genre: "Action • Multilingue", score: 9.45, img: "#1e1b4b" },
+            { title: "Solo Leveling : Arise S2", genre: "Action • Licencié", score: 9.20, img: "#311042" },
+            { title: "Demon Slayer : Forteresse", genre: "Action • Film Cinéma", score: 9.60, img: "#450a0a" },
+            { title: "Frieren : Beyond Journey", genre: "Fantasy • HD 60FPS", score: 9.50, img: "#042f2e" }
+        ];
+
+        function renderCards(list, targetId) {
+            const container = document.getElementById(targetId);
+            if(!container) return;
+            container.innerHTML = list.map(a => `
+                <div class="card-item" onclick="alert('Lecture de ${a.title} en 4K HDR VOSTFR/VF.')">
+                    <div class="card-poster" style="background:${a.img};">
+                        <div class="card-tag">★ ${a.score}</div>
+                        <div style="position:absolute; top:45%; width:100%; text-align:center; font-weight:900; font-size:18px; color:#fff;">${a.title.split(' ')[0].toUpperCase()}</div>
+                    </div>
+                    <div class="card-content">
+                        <div style="font-size:11px; color:var(--accent-cyan); font-weight:600; margin-bottom:4px;">${a.genre}</div>
+                        <div class="card-title">${a.title}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function navigate(tabId) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            const target = document.getElementById(`panel-${tabId}`);
+            if(target) target.classList.add('active');
+        }
+
+        function switchAdminTab(subId, btn) {
+            document.querySelectorAll('.admin-subpanel').forEach(sp => sp.classList.remove('active'));
+            document.querySelectorAll('.admin-tab-btn').forEach(tb => tb.classList.remove('active'));
+            btn.classList.add('active');
+            const target = document.getElementById(`sub-${subId}`);
+            if(target) target.classList.add('active');
+        }
+
+        function adminGiveCredits(username) {
+            alert(`🎉 Super Admin : +500 Crédits attribués instantanément à l'utilisateur ${username} !`);
+        }
+
+        function triggerAdminAI(promptText) {
+            const box = document.getElementById('admin-ai-response-box');
+            box.innerHTML = `🤖 <i>Analyse en cours par AnimeHub OS AI pour malickakodo151@gmail.com...</i>`;
+            setTimeout(() => {
+                if(promptText.includes('financier')) {
+                    box.innerHTML = `🤖 <b>Analyse Financière Stratégique :</b><br>• Revenus totaux : 52,930 € / Dépenses S3 & Licences : 8,650 € = <b>Bénéfice Net : 44,280 €</b>.<br>• Recommandation : Passer la fréquence des pubs récompensées Unity Ads à 20s pour augmenter l'eCPM de +14%.`;
+                } else if(promptText.includes('Anomalies')) {
+                    box.innerHTML = `🤖 <b>Audit Sécurité & Anti-Cheat :</b><br>• 42 comptes bots ont tenté de simuler des pings de session active. Le bouclier RSA les a bloqués en temps réel.<br>• Le compte <b>malickakodo151@gmail.com</b> bénéficie d'une intégrité cryptographique absolue (0 tentative d'intrusion).`;
+                } else {
+                    box.innerHTML = `🤖 <b>Suggestion d'Acquisitions Q3 :</b><br>D'après les recherches mondiales sur l'IA, les licences les plus réclamées sont <i>Sakamoto Days</i> et la suite de <i>Chainsaw Man</i>. Négociation conseillée pour les droits de diffusion VOSTFR / VF !`;
+                }
+            }, 700);
+        }
+
+        renderCards(CATALOG, 'grid-trending');
+    </script>
+</body>
+</html>
